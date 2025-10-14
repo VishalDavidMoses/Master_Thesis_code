@@ -1,0 +1,70 @@
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+file_path = r'/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/hoo1p0eVv0j40_gr_3p0_freed_test_run_2.out'
+
+
+def file_to_combined_lists(file_path, group_size=3):
+    combined_lists = []  # Final list to store combined rows
+    current_group = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.strip() #remove leading/trailing whitespace the spaces between the values are ignored in this function  
+            if not line: #skips empty lines
+                continue
+    
+            # The below method " .extend" takes each element of the output and separates them by commas to make them an element in the list
+            current_group.extend(line.split())
+            if len(current_group) == 29:
+                combined_lists.append(current_group)
+                current_group = []
+    return combined_lists
+
+
+#Section below is the section I'm currently working on
+############################################################################################################################################################################
+############################################################################################################################################################################
+# example of directory name ---> Jini-01_Ecoll-0.1kcalmol
+# example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
+
+directory = r'C:/Temporary_important_folder_1/Thesis_output_data_folder' 
+main_dictionary = {}
+for folder in os.listdir(directory):
+    
+    if folder.startswith("j_") and os.path.isdir(os.path.join(directory,folder)):
+        
+        folder_name = str(folder)
+        indeces_of_folder_name = folder.split('_')
+        index_1 = indeces_of_folder_name[1]
+        main_dictionary[folder_name] = 
+        for inner_folder in os.listdir(folder):
+            if inner_folder.startswith("")
+            fix_b_part = file.split('_____')[1]
+            number_part = fix_b_part.split('_')[1]
+            impact_parameter = float(number_part)
+            
+            E_coll_part
+            for file in os.listdir(inner_folder):
+                if file.startswith(""):
+                    blablabla
+                
+        #call refinied energy levels function
+        #call refined complex formation function
+
+
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+#Some variables for the above section
+############################################################################################################################################################################
+############################################################################################################################################################################
+impact_parameter = "blablabla"
+impact_parameter_part = impact_parameter ** 2
+pi = 3.1416
+first_part = pi * impact_parameter_part
+second_part = probabilty_part
+cross_section = first_part * second_part
+############################################################################################################################################################################
+############################################################################################################################################################################
