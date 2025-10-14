@@ -1,0 +1,41 @@
+# example of directory name ---> Jini-01_Ecoll-0.1kcalmol
+# example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
+
+directory_path = r'C:\Thesis_output_data_folder\j_11_dir_trial_2'
+main_dictionary = {}
+for directory in os.listdir(directory_path):
+    dir_path = os.path.join(directory_path, directory)
+    if os.path.isdir(dir_path) and "j_11_dir" in directory: #This changes to j_
+        dir_key = directory.replace('-', '_').replace('.', 'p') 
+        main_dictionary[dir_key] = {}
+        
+        for inner_dir in os.listdir(dir_path):
+            
+            if inner_dir.endswith('_kcalpmol'):
+                dir_path_level_2 = os.path.join(dir_path, inner_dir)
+                # 
+                for output_files in os.listdir(dir_path_level_2):
+                    if output_files.endswith('.out') and "_____fixb" in output_files:
+                        file_path = os.path.join(dir_path_level_2, output_files)
+                        
+                        Ecoll_part = output_files.split('_____')[0]
+                        kcal_part = Ecoll_part.split('_')[1]
+                        Ecoll = kcal_part.split('k')[0]
+
+                        fixb_part = output_files.split('_____')[1]
+                        str_impact_par = fixb_part.split('_')[1]
+                        impact_par = float(str_impact_par)
+        
+                        main_dictionary[dir_key][float(Ecoll)] = [] 
+                        
+                        # return P_r_of_inelastic, number_of_inelastic_trajs, tot_number_of_inelastic_trajs
+                        
+                        probability_of_inelastic_collision, number_of_inelastic_collisions, tot_number_of_inelastic_trajs = probability_of_inelastic_colls_function(nested_list)
+                        
+                        main_dictionary[dir_key][float(Ecoll)].append(probability_of_inelastic_collision)  # 0
+                        main_dictionary[dir_key][float(Ecoll)].append(number_of_inelastic_collisions)      # 1
+                        main_dictionary[dir_key][float(Ecoll)].append(tot_number_of_inelastic_trajs)      # 2
+                        # main_dictionary[dir_key][float(Ecoll)].append(impact_par)                       # 3
+                        # print(f'{output_files}')
+    elif os.path.isdir(dir_path) and "j_11_dir" and "" in directory
+print(main_dictionary)
