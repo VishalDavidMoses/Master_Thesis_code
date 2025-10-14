@@ -130,3 +130,119 @@ def energy_levels_function(combined_data):
     plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/energy_levels_cross_section_plot.png")
     
     plt.show()
+
+
+energy_levels_function(combined_data=combined_data)
+
+
+#Making a distribution for different rotational numbers where complex formation happened
+
+def complex_formation_function(combined_data):
+
+    final_rotational_levels = []
+    
+    for row in combined_data:
+        final_rotational_levels.append(row[17])
+    
+    final_rotational_levels = [float(value) for value in final_rotational_levels]
+    
+    largest_value = max(final_rotational_levels) 
+    largest_value = math.ceil(float(largest_value))
+    
+    rotation_groups_cplx_ = {}
+    
+    for final_rotation_cplx in np.arange(0, largest_value):
+        rotation_groups_cplx_[final_rotation_cplx] = []
+            
+        for level in combined_data:
+            # Convert level to a float (if it's a string)
+            rotational_level = float(level[17])
+            cplx = float(level[4])
+            
+            if final_rotation_cplx - 0.5 <= rotational_level <= final_rotation_cplx + 0.4:
+                if cplx > 0:
+                    rotation_groups_cplx_[final_rotation_cplx].append(cplx)
+                    
+    
+                    #rotation_groups_[final_rotation].append(level)
+    
+    
+    print(rotation_groups_cplx_)
+    
+    rotation_group_cplx_frmtn_frequency_ = {}
+    cplx_frmtn_frequency_ = 0
+    for level in rotation_groups_cplx_:
+        cplx_frmtn_frequency_ = len(rotation_groups_cplx_[level])
+        rotation_group_cplx_frmtn_frequency_[level] = (cplx_frmtn_frequency_)#the brakets may not be necessary
+    
+    print(rotation_group_cplx_frmtn_frequency_)
+    
+    rotation_level_number_cplx = list(rotation_group_cplx_frmtn_frequency_.keys())  # x-axis values
+    poplation_of_cplx_frmtn_rotation_level_number = [v for v in rotation_group_cplx_frmtn_frequency_.values()]  # y-axis values (extracting from lists)
+    
+    print(rotation_level_number_cplx)
+    print(poplation_of_cplx_frmtn_rotation_level_number)
+    
+    #hist = np.arange(len(rotation_group_cplx_frmtn_frequency_.keys()))
+    #width = 10     # gives histogram aspect to the bar diagram
+    
+    fig, ax = plt.subplots(figsize=(25, 6))
+    
+    ax.set_xticks(rotation_level_number_cplx)  # Ticks for each element
+    ax.set_xticklabels(rotation_level_number_cplx)  # Labels for each tick (same as the values)
+    
+    #plt.figure(figsize=(10, 6))
+    
+    plt.bar(rotation_level_number_cplx, poplation_of_cplx_frmtn_rotation_level_number, color='g', width=0.5, edgecolor='black')
+    
+    plt.xlabel("Rotational level")  # Label for the x-axis
+    plt.ylabel("Population of complex formation for each rotational levels")  # Label for the y-axis
+    plt.title("Rotational level complex formation plot")  # Title for the plot
+
+    plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/complex_formation_plot.png")
+    
+    plt.show()
+    
+    b_max = 3
+    pi = 3.1416
+    first_term = pi*(b_max**2)
+    first_term
+    #N_j40 = len(rotation_groups_[40])
+    N_tot = 1000
+    
+    cross_section = 0
+    cross_section_for_all_levels_cplx_frmtn = {}
+    N_j = {}
+    for level in rotation_group_cplx_frmtn_frequency_:
+        key = f"j_{level}" 
+        N_j[key] =  rotation_group_cplx_frmtn_frequency_[level]
+        second_term = N_j[key]/N_tot
+        cross_section_cplx = first_term*second_term
+        cross_section_for_all_levels_cplx_frmtn[key] = cross_section_cplx
+
+    print(cross_section_for_all_levels_cplx_frmtn)
+
+    rotation_level_cplx = list(cross_section_for_all_levels_cplx_frmtn.keys())  # x-axis values
+    cross_section_cplx = [v for v in cross_section_for_all_levels_cplx_frmtn.values()]  # y-axis values (extracting from lists)
+
+    fig, ax = plt.subplots(figsize=(30, 6))
+    
+    ax.set_xticks(rotation_level_number_cplx)  # Ticks for each element
+    ax.set_xticklabels(rotation_level_cplx)  # Labels for each tick (same as the values)
+    
+    #plt.figure(figsize=(10, 6))
+    
+    plt.bar(rotation_level_number_cplx, cross_section_cplx, color='g', width=0.5, edgecolor='black')
+    
+    plt.xlabel("Rotational level")  # Label for the x-axis
+    plt.ylabel("Cross section of rotational levels for complex formation")  # Label for the y-axis
+    plt.title("Rotational level complex formation cross section plot")  # Title for the plot
+    
+    plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/complex_formation_cross_section_plot.png")
+    
+    plt.show()
+
+
+complex_formation_function(combined_data=combined_data)
+
+
