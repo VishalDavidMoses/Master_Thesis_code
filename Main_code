@@ -1,0 +1,132 @@
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+file_path = r'/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/hoo1p0eVv0j40_gr_3p0_freed_test_run_2.out'
+
+def file_to_combined_lists(file_path, group_size=3):
+    combined_lists = []  # Final list to store combined rows
+    current_group = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.strip() #remove leading/trailing whitespace the spaces between the values are ignored in this function  
+            if not line: #skips empty lines
+                continue
+    
+            # The below method " .extend" takes each element of the output and separates them by commas to make them an element in the list
+            current_group.extend(line.split())
+            if len(current_group) == 29:
+                combined_lists.append(current_group)
+                current_group = []
+    return combined_lists
+
+
+combined_data = file_to_combined_lists(file_path = file_path)
+
+#print(combined_data)# I don't think this is needed later
+
+
+#Energy levels population distribution
+def energy_levels_function(combined_data):
+    final_rotational_levels = []
+    
+    for row in combined_data:
+        final_rotational_levels.append(row[17])
+    
+    #print(final_rotational_levels) #Not needed
+    final_rotational_levels = [float(value) for value in final_rotational_levels]
+    
+    largest_value = max(final_rotational_levels) 
+    largest_value = math.ceil(float(largest_value)) #I think the float here is uneccessary
+    
+    #Making a distribution for different rotational numbers 
+    
+    rotation_groups_ = {}
+    #x_upper_lim
+    for final_rotation in np.arange(0, largest_value ):
+        rotation_groups_[final_rotation] = []
+        
+        for level in final_rotational_levels:
+            # Convert level to a float (if it's a string)
+            level = float(level)
+            
+            if final_rotation - 0.5 <= level <= final_rotation + 0.4:
+                rotation_groups_[final_rotation].append(level)
+                    
+            
+                    
+    print(rotation_groups_)
+    
+    rotation_group_frequency_ = {}
+    frequency_ = 0 # this line is useless mostlikely
+    for level in rotation_groups_:
+        frequency_ = len(rotation_groups_[level])
+        rotation_group_frequency_[level] = frequency_
+    
+    print(rotation_group_frequency_)
+    
+    rotation_level_number = list(rotation_group_frequency_.keys())  # x-axis values
+    poplation_of_rotation_level_number = [v for v in rotation_group_frequency_.values()]  # y-axis values (extracting from lists)
+    
+    #print(rotation_level_number)
+    #print(poplation_of_rotation_level_number)
+    
+    #histogram graph 
+    
+    fig, ax = plt.subplots(figsize=(25, 6))
+    
+    ax.set_xticks(rotation_level_number)  # Ticks for each element
+    ax.set_xticklabels(rotation_level_number)  # Labels for each tick (same as the values)
+    
+    #plt.figure(figsize=(10, 6))
+    
+    plt.bar(rotation_level_number, poplation_of_rotation_level_number, color='g', width=0.5, edgecolor='black')
+    
+    plt.xlabel("Rotational level")  # Label for the x-axis
+    plt.ylabel("Population of rotational levels")  # Label for the y-axis
+    plt.title("Energy level population plot")  # Title for the plot
+    
+    plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/energy_levels_plot.png")
+    
+    plt.show()
+
+    #regualar cross-section for different rotational levels
+    b_max = 3
+    pi = 3.1416
+    first_term = pi*(b_max**2)
+    first_term
+    #N_j40 = len(rotation_groups_[40])
+    N_tot = 1000
+    
+    cross_section = 0
+    cross_section_for_all_levels = {}
+    N_j = {}
+    for level in rotation_group_frequency_:
+        key = f"j_{level}" 
+        N_j[key] =  rotation_group_frequency_[level]
+        second_term = N_j[key]/N_tot
+        cross_section = first_term*second_term
+        cross_section_for_all_levels[key] = cross_section
+    
+    print(cross_section_for_all_levels)
+
+    rotation_level = list(cross_section_for_all_levels.keys())  # x-axis values
+    cross_section = [v for v in cross_section_for_all_levels.values()]  # y-axis values (extracting from lists)
+
+    fig, ax = plt.subplots(figsize=(30, 6))
+    
+    ax.set_xticks(rotation_level_number)  # Ticks for each element
+    ax.set_xticklabels(rotation_level)  # Labels for each tick (same as the values)
+    
+    #plt.figure(figsize=(10, 6))
+    
+    plt.bar(rotation_level, cross_section, color='g', width=0.5, edgecolor='black')
+    
+    plt.xlabel("Rotational level")  # Label for the x-axis
+    plt.ylabel("Cross section of rotational levels")  # Label for the y-axis
+    plt.title("Energy level cross section plot")  # Title for the plot
+    
+    plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/energy_levels_cross_section_plot.png")
+    
+    plt.show()
