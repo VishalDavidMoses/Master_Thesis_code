@@ -26,33 +26,77 @@ def file_to_combined_lists(file_path, group_size=3):
 #Section below is the section I'm currently working on
 ############################################################################################################################################################################
 ############################################################################################################################################################################
+
 # example of directory name ---> Jini-01_Ecoll-0.1kcalmol
 # example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
+
+largest_initial_rotational_level = "blablabla" #Enter file path here
+file_to_combined_lists(file_path = largest_initial_rotational_level)
+
+#First designate highest rotational levels
+final_rotational_levels = []
+
+for row in combined_data:
+    final_rotational_levels.append(row[17])
+
+final_rotational_levels = [float(value) for value in final_rotational_levels]
+
+largest_value = max(final_rotational_levels) 
+largest_value = math.ceil(float(largest_value))
 
 directory = r'C:/Temporary_important_folder_1/Thesis_output_data_folder' 
 main_dictionary = {}
 for folder in os.listdir(directory):
     
     if folder.startswith("j_") and os.path.isdir(os.path.join(directory,folder)):
-        
+        #Sample j_ folder name -> j_01_dir
         folder_name = str(folder)
         indeces_of_folder_name = folder.split('_')
-        index_1 = indeces_of_folder_name[1]
-        main_dictionary[folder_name] = 
-        for inner_folder in os.listdir(folder):
-            if inner_folder.startswith("")
-            fix_b_part = file.split('_____')[1]
-            number_part = fix_b_part.split('_')[1]
-            impact_parameter = float(number_part)
-            
-            E_coll_part
-            for file in os.listdir(inner_folder):
-                if file.startswith(""):
-                    blablabla
+        #index_0 and index_1 contribute to the rotational level key name
+        index_1 = f"{indeces_of_folder_name[1]}"
+        index_0 =  f"{indeces_of_folder_name[0]}"
+        initial_rotational_level = f"{index_0}_{index_1}"
+        #Initialise a dictionary for the rotational level in the "main dictionary"
+        main_dictionary[initial_rotational_level] ={}  
+        for E_coll_folder in os.listdir(folder):
+            #iterating through the E_coll directories
+            if E_coll_folder.startswith("E_coll_"):
+                #E_coll directories
                 
-        #call refinied energy levels function
-        #call refined complex formation function
-
+                E_coll_folder_indeces = E_coll_folder.split("_")
+                #sample E_coll folder name -> E_coll_0.05_kcalpmol
+                E_coll_keys = f"{E_coll_folder_indeces[0]}_{E_coll_folder_indeces[1]}_{E_coll_folder_indeces[2]}"
+                E_coll_value = float(E_coll_folder_indeces[2])
+                
+                #Initialising an E_coll dictionary
+                main_dictionary[initial_rotational_level][E_coll_keys] ={}
+                for data_file in os.listdir(E_coll_folder):
+                    if ("_____fixb_") in data_file:
+                        # example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
+                        #retrieving the impact parameter
+                        fix_b_part = data_file.split('_____')[1]
+                        number_part = fix_b_part.split('_')[1]
+                        impact_parameter = float(number_part)
+                        
+                        file_to_combined_lists(file_path = data_file)
+                        
+                        #Highest rotational level designated in the section above the nested for loops in this block
+                        for final_rotation in np.arange(1, largest_value + 1, 2):
+                            initial_to_final_key = f"{initial_rotation}_->_{final_rotation}" 
+                            
+                        final_rotational_levels = []
+    
+                        for row in combined_data:
+                            final_rotational_levels.append(row[17])
+                        
+                        final_rotational_levels = [float(value) for value in final_rotational_levels]
+                        
+                        largest_value = max(final_rotational_levels) 
+                        largest_value = math.ceil(float(largest_value))
+                        #bla bla bla
+                        #call refinied energy levels function
+                        #call refined complex formation function
+        
 
 ############################################################################################################################################################################
 ############################################################################################################################################################################
