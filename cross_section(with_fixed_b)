@@ -49,7 +49,7 @@ main_dictionary = {}
 for folder in os.listdir(directory):
     
     if folder.startswith("j_") and os.path.isdir(os.path.join(directory,folder)):
-        #Sample j_ folder name -> j_01_dir
+        #Sample j_ folder name -> j_01_dir (remember to remove the preceding 0s from the directory names)
         folder_name = str(folder)
         indeces_of_folder_name = folder.split('_')
         #index_0 and index_1 contribute to the rotational level key name
@@ -66,7 +66,8 @@ for folder in os.listdir(directory):
                 E_coll_folder_indeces = E_coll_folder.split("_")
                 #sample E_coll folder name -> E_coll_0.05_kcalpmol
                 E_coll_keys = f"{E_coll_folder_indeces[0]}_{E_coll_folder_indeces[1]}_{E_coll_folder_indeces[2]}"
-                E_coll_value = float(E_coll_folder_indeces[2])
+                E_coll_float_value = float(E_coll_folder_indeces[2])#By value I mean the actual floating point value, not like dictionary "key" and
+                                                                    #"Value"
                 
                 #Initialising an E_coll dictionary
                 main_dictionary[initial_rotational_level][E_coll_keys] ={}
@@ -79,29 +80,33 @@ for folder in os.listdir(directory):
                         impact_parameter = float(number_part)
                         
                         file_to_combined_lists(file_path = data_file)
+
                         
                         #Highest rotational level designated in the section above the nested for loops in this block
+                        #
+                        
+                        #Code below probaly does not belong here as I already did it before the nested for loop started
+                        
                         for final_rotation in np.arange(1, largest_value + 1, 2):
-                            initial_to_final_key = f"{initial_rotation}_->_{final_rotation}" 
                             
-                        final_rotational_levels = []
-    
-                        for row in combined_data:
-                            final_rotational_levels.append(row[17])
-                        
-                        final_rotational_levels = [float(value) for value in final_rotational_levels]
-                        
-                        largest_value = max(final_rotational_levels) 
-                        largest_value = math.ceil(float(largest_value))
-                        #bla bla bla
-                        #call refinied energy levels function
-                        #call refined complex formation function
-        
-
+                            initial_to_final_key = f"{initial_rotational_level}->j_{final_rotation}" #Example of key: j_1->j_10
+                            
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key] =[]
+                            
+                            #
+                            
+                            #
+                            
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(E_coll_float_value)
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(impact_parameter)
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_collisions)
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_cplx_collisions)
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(total_no_of_trajectories)
+                            
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
-#Some variables for the above section
+#Some variables for the above section (probably not even needed) 
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 impact_parameter = "blablabla"
@@ -112,3 +117,24 @@ second_part = probabilty_part
 cross_section = first_part * second_part
 ############################################################################################################################################################################
 ############################################################################################################################################################################
+
+#function definied to add elements to the list and called in the above for loop
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,impact_paramter_max,final_rotational_level_int):
+    inelastic_collisions_list = []
+    cplx_forming_collisions_list = []
+    for trajectory in data_to_process:
+        final_rotation_float = trajectory[17] #17th element for each trajectory
+        cplx_yes_or_no = trajectory[4]
+        if final_rotational_level - 1.0 <= final_rotation_float <= final_rotational_level + 0.9:
+            inelastic_collisions_list.append(final_rotation_float)
+            if cplx_yes_or_no != 0:
+                cplx_forming_collisions_list.append(final_rotation_float)
+    
+    no_of_collisions = len(inelastic_collisions_list)
+    no_of_cplx_collisions = len(cplx_forming_collisions_list)
+            
+    return no_of_collisions, no_of_cplx_collisions, total_no_of_trajectories
+
