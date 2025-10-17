@@ -1,3 +1,15 @@
+def probability_of_inelastic_colls_function(combined_data):
+    final_rotational_levels_equal_to_Jini = []
+    for row in combined_data:
+        if row[17] == row[16]:  # or whatever your condition is
+            final_rotational_levels_equal_to_Jini.append(row[17])
+    number_of_elastic_trajs = len(final_rotational_levels_equal_to_Jini)
+    tot_number_of_inelastic_trajs = float(combined_data[-1][0])
+    number_of_inelastic_trajs = tot_number_of_inelastic_trajs - number_of_elastic_trajs
+    P_r_of_inelastic = number_of_inelastic_trajs / tot_number_of_inelastic_trajs
+    return P_r_of_inelastic, number_of_inelastic_trajs, tot_number_of_inelastic_trajs
+
+
 directory_path = r'C:\Thesis_output_data_folder\j_11_dir_trial_2'
 main_dictionary = {}
 
