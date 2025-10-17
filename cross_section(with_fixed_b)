@@ -23,6 +23,30 @@ def file_to_combined_lists(file_path, group_size=3):
     return combined_lists
 
 
+#function definied to add elements to the list and called in the below nested for loop
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,impact_paramter_max,final_rotational_level_int):
+    inelastic_collisions_list = []
+    cplx_forming_collisions_list = []
+    for trajectory in data_to_process:
+        final_rotation_float = trajectory[17] #17th element for each trajectory
+        cplx_yes_or_no = trajectory[4]
+        if final_rotational_level - 1.0 <= final_rotation_float <= final_rotational_level + 0.9:
+            inelastic_collisions_list.append(final_rotation_float)
+            if cplx_yes_or_no != 0:
+                cplx_forming_collisions_list.append(final_rotation_float)
+    
+    no_of_collisions = len(inelastic_collisions_list)
+    no_of_cplx_collisions = len(cplx_forming_collisions_list)
+            
+    return no_of_collisions, no_of_cplx_collisions, total_no_of_trajectories
+
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+
 #Section below is the section I'm currently working on
 ############################################################################################################################################################################
 ############################################################################################################################################################################
@@ -117,24 +141,3 @@ second_part = probabilty_part
 cross_section = first_part * second_part
 ############################################################################################################################################################################
 ############################################################################################################################################################################
-
-#function definied to add elements to the list and called in the above for loop
-############################################################################################################################################################################
-############################################################################################################################################################################
-
-def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,impact_paramter_max,final_rotational_level_int):
-    inelastic_collisions_list = []
-    cplx_forming_collisions_list = []
-    for trajectory in data_to_process:
-        final_rotation_float = trajectory[17] #17th element for each trajectory
-        cplx_yes_or_no = trajectory[4]
-        if final_rotational_level - 1.0 <= final_rotation_float <= final_rotational_level + 0.9:
-            inelastic_collisions_list.append(final_rotation_float)
-            if cplx_yes_or_no != 0:
-                cplx_forming_collisions_list.append(final_rotation_float)
-    
-    no_of_collisions = len(inelastic_collisions_list)
-    no_of_cplx_collisions = len(cplx_forming_collisions_list)
-            
-    return no_of_collisions, no_of_cplx_collisions, total_no_of_trajectories
-
