@@ -33,7 +33,7 @@ def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,imp
     for trajectory in data_to_process:
         final_rotation_float = trajectory[17] #17th element for each trajectory
         cplx_yes_or_no = trajectory[4]
-        if final_rotational_level - 1.0 <= final_rotation_float <= final_rotational_level + 0.9:
+        if final_rotational_level_int - 1.0 <= final_rotation_float <= final_rotational_level_int + 0.9:
             inelastic_collisions_list.append(final_rotation_float)
             if cplx_yes_or_no != 0:
                 cplx_forming_collisions_list.append(final_rotation_float)
@@ -75,11 +75,13 @@ for folder in os.listdir(directory):
     if folder.startswith("j_") and os.path.isdir(os.path.join(directory,folder)):
         #Sample j_ folder name -> j_01_dir (remember to remove the preceding 0s from the directory names)
         folder_name = str(folder)
-        indeces_of_folder_name = folder.split('_')
+        ########################### These lines maybe necessary for sorting code I do at the very end
+        #indeces_of_folder_name = folder.split('_')                        # This may not be necessary
         #index_0 and index_1 contribute to the rotational level key name
-        index_1 = f"{indeces_of_folder_name[1]}"
-        index_0 =  f"{indeces_of_folder_name[0]}"
-        initial_rotational_level = f"{index_0}_{index_1}"
+        #index_1 = f"{indeces_of_folder_name[1]}"                          # --------"----------------
+        #index_0 =  f"{indeces_of_folder_name[0]}"                         # --------"----------------
+        ##########################
+        initial_rotational_level = folder_name             #f"{index_0}_{index_1}" This may not even be necessary
         #Initialise a dictionary for the rotational level in the "main dictionary"
         main_dictionary[initial_rotational_level] ={}  
         for E_coll_folder in os.listdir(folder):
@@ -101,24 +103,21 @@ for folder in os.listdir(directory):
                         #retrieving the impact parameter
                         fix_b_part = data_file.split('_____')[1]
                         number_part = fix_b_part.split('_')[1]
-                        impact_parameter = float(number_part)
+                        impact_parameter_float_value = float(number_part)
                         
-                        file_to_combined_lists(file_path = data_file)
+                        nested_lists = file_to_combined_lists(file_path = data_file)
 
-                        
                         #Highest rotational level designated in the section above the nested for loops in this block
-                        #
                         
-                        #Code below probaly does not belong here as I already did it before the nested for loop started
                         
                         for final_rotation in np.arange(1, largest_value + 1, 2):
                             
                             initial_to_final_key = f"{initial_rotational_level}->j_{final_rotation}" #Example of key: j_1->j_10
                             
-                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key] =[]
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key] = []
                             
-                            #
-                            
+                            #blebleble
+                            no_of_collisions, no_of_cplx_collisions, total_no_of_trajectories = inelastic_and_cplx_formation_function(data_to_process = nested_lists, collisional_energy = E_coll_float_value ,impact_paramter_max = impact_parameter_float_value, final_rotational_level_int = final_rotation)
                             #
                             
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(E_coll_float_value)
@@ -126,6 +125,30 @@ for folder in os.listdir(directory):
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_collisions)
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_cplx_collisions)
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(total_no_of_trajectories)
+                            
+                            
+                            
+                            #Following code should be done in a separate block which reads the dictionary made
+                            ##################################################################################
+                            ##################################################################################
+                            #for each_key in main_dictionary:
+                                #dictionary_key = each_key.split
+                                #dictionary_level = dictionary[1]
+                                #current_directory = initial_rotational_level.split
+                                #current_directory_level = current_directory[1]
+                                
+                                #if "_low_Ecoll_" and dictionary_level == current_directory_level:
+                            #####################################################################################
+                            #####################################################################################
+                            
+                            
+#At the end of the day Ronnie I am a file. A file who is a JSON file get that through your head
+#We will not process the file. The file is purely for human reading purposes only. So that I, the human, understand the format of the dictionary
+#Lil bro, the computer, will just be reading the dictionary
+with open("main_dictionary", "w") as f:
+    f.write(str(main_dictionary))
+                            
+                            
                             
 ############################################################################################################################################################################
 ############################################################################################################################################################################
