@@ -156,19 +156,33 @@ with open("main_dictionary", "w") as f:
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
+#Still a work in progress, really annoying though
 #initialise a new dictionary
 refined_dictionary = {}
-for rotational_levels in main_dictionary:
-    j_keys = rotational_levels.keys
-    elements_of_the_j_key_name = j_keys.split("_")#Might not be necessary
+for rotational_levels, rotational_levels_dict_values in main_dictionary:
+    #j_keys = rotational_levels.keys #Not needed
+    #j_values = rotational_levels.values #Not needed
+    elements_of_the_j_key_name = rotational_levels.split("_")#Might not be necessary
     if "j_" in j_keys:
-        refined_dictionary.append(rotational_levels)
+        refined_dictionary[j_keys] = rotational_levels[j_keys]
+        #refined_dictionary.append(rotational_levels) #This is not the way to add things to the dictionary
+    if "j_" in j_keys:
+        refined_dictionary[j_keys] = rotational_levels[j_keys]
+        #refined_dictionary.append(rotational_levels) #This is not the way to add things to the dictionary
     elif "j_" and "low_Ecoll" in j_keys:
-        for levels in refined_dictionary:
+        for levels, levels_dict_values in refined_dictionary:
+            elements_key_name_refined_dict = levels.split("_")
+            if elements_key_name_refined_dict[1] == elements_of_the_j_key_name[1]:
+                #Have to continue from here, my thoughts are a little eratic with how the code should go
+                #But lil bro is cooking
+                for E_colls, E_coll_dict_values in main_dictionary[levels]:
+                    
+                main_dictionary[rotational_levels][E_coll_keys][initial_to_final_key]
             level = levels.keys
             
             if 
     j_dict_values = #May not be needed
+
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
