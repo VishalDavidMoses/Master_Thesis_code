@@ -31,15 +31,18 @@ def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,imp
     inelastic_collisions_list = []
     cplx_forming_collisions_list = []
     for trajectory in data_to_process:
-        final_rotation_float = trajectory[17] #17th element for each trajectory
-        cplx_yes_or_no = trajectory[4]
+        final_rotation_float = float(trajectory[17]) #17th element for each trajectory
+        cplx_yes_or_no = float(trajectory[4]) #4th element in each trajectory
         if final_rotational_level_int - 1.0 <= final_rotation_float <= final_rotational_level_int + 0.9:
+            #print(final_rotational_level_int) #In cases of error uncomment the line
             inelastic_collisions_list.append(final_rotation_float)
             if cplx_yes_or_no != 0:
                 cplx_forming_collisions_list.append(final_rotation_float)
     
     no_of_collisions = len(inelastic_collisions_list)
     no_of_cplx_collisions = len(cplx_forming_collisions_list)
+    last_trajectory = data_to_process[-1]
+    total_no_of_trajectories = float(last_trajectory[0])
             
     return no_of_collisions, no_of_cplx_collisions, total_no_of_trajectories
 
@@ -54,8 +57,8 @@ def inelastic_and_cplx_formation_function(data_to_process,collisional_energy,imp
 # example of directory name ---> Jini-01_Ecoll-0.1kcalmol
 # example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
 
-largest_initial_rotational_level = "blablabla" #Enter file path here
-file_to_combined_lists(file_path = largest_initial_rotational_level)
+largest_initial_rotational_level = "C:/Temporary_important_folder_1/Thesis_output_data_folder/j_21_dir/E_coll_7.0_kcalpmol/ho2_7.0kcal_v0j21_____fixb_4.0_yyy.out" #Enter file path here
+combined_data = file_to_combined_lists(file_path = largest_initial_rotational_level)
 
 #First designate highest rotational levels
 final_rotational_levels = []
@@ -84,7 +87,9 @@ for folder in os.listdir(directory):
         initial_rotational_level = folder_name             #f"{index_0}_{index_1}" This may not even be necessary
         #Initialise a dictionary for the rotational level in the "main dictionary"
         main_dictionary[initial_rotational_level] ={}  
-        for E_coll_folder in os.listdir(folder):
+        rotational_dirs = os.path.join(directory,folder)
+        
+        for E_coll_folder in os.listdir(rotational_dirs):
             #iterating through the E_coll directories
             if E_coll_folder.startswith("E_coll_"):
                 #E_coll directories
@@ -97,7 +102,10 @@ for folder in os.listdir(directory):
                 
                 #Initialising an E_coll dictionary
                 main_dictionary[initial_rotational_level][E_coll_keys] ={}
-                for data_file in os.listdir(E_coll_folder):
+                
+                E_coll_dirs = os.path.join(rotational_dirs,E_coll_folder)
+                
+                for data_file in os.listdir(E_coll_dirs):
                     if ("_____fixb_") in data_file:
                         # example of file name --------> ho2_0.1kcal_v0j01_____fixb_0.0_yyy.out
                         #retrieving the impact parameter
@@ -105,13 +113,19 @@ for folder in os.listdir(directory):
                         number_part = fix_b_part.split('_')[1]
                         impact_parameter_float_value = float(number_part)
                         
-                        nested_lists = file_to_combined_lists(file_path = data_file)
+                        output_file_path = os.path.join(E_coll_dirs,data_file)
+                        
+                        nested_lists = file_to_combined_lists(file_path = output_file_path)
+                        #with open("nested_list", "w") as f: #!!!!!!! UNCOMMENT ON IN CASE OF ERROR
+                            #f.write(str(nested_lists))
 
                         #Highest rotational level designated in the section above the nested for loops in this block
                         
                         
                         for final_rotation in np.arange(1, largest_value + 1, 2):
                             
+                            #print the final_rotation
+                            #print(final_rotation) #UNCOMMENT ONLY IN CASE OF ERROR
                             initial_to_final_key = f"{initial_rotational_level}->j_{final_rotation}" #Example of key: j_1->j_10
                             
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key] = []
@@ -121,35 +135,19 @@ for folder in os.listdir(directory):
                             #
                             
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(E_coll_float_value)
-                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(impact_parameter)
+                            main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(impact_parameter_float_value)
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_collisions)
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(no_of_cplx_collisions)
                             main_dictionary[initial_rotational_level][E_coll_keys][initial_to_final_key].append(total_no_of_trajectories)
                             
-                            
-                            
-                            #Following code should be done in a separate block which reads the dictionary made
-                            ##################################################################################
-                            ##################################################################################
-                            #for each_key in main_dictionary:
-                                #dictionary_key = each_key.split
-                                #dictionary_level = dictionary[1]
-                                #current_directory = initial_rotational_level.split
-                                #current_directory_level = current_directory[1]
-                                
-                                #if "_low_Ecoll_" and dictionary_level == current_directory_level:
-                            #####################################################################################
-                            #####################################################################################
-                            
-                            
 #At the end of the day Ronnie I am a file. A file who is a JSON file get that through your head
 #We will not process the file. The file is purely for human reading purposes only. So that I, the human, understand the format of the dictionary
-#Lil bro, the computer, will just be reading the dictionary
+#And lil bro, the computer, will just be reading the dictionary
 with open("main_dictionary", "w") as f:
     f.write(str(main_dictionary))
-                            
-                            
-                            
+
+
+
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
