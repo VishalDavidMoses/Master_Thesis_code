@@ -154,45 +154,57 @@ with open("main_dictionary", "w") as f:
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
-#Still a work in progress, really annoying though
-#initialise a new dictionary
-#Elements of the list that need to be added are @ index number [2], [3] and [4]
-refined_dictionary = {}
-for rotational_levels, rotational_levels_dict_values in main_dictionary:
-    j_keys = rotational_levels.keys #Not needed
-    j_values = rotational_levels.values #Not needed
-    elements_of_the_j_key_name = rotational_levels.split("_")#Might not be necessary
+import ast
+
+with open("main_dictionary", "r") as f:
+    contents = f.read()
+    
+new_main_dictionary = ast.literal_eval(contents)
+new_main_dictionary
+
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+############################################################################################################################################################################
+############################################################################################################################################################################
+
+refined_dictionary={}
+
+for rotational_levels, rotational_levels_dict_values in new_main_dictionary.items():
+    j_keys = rotational_levels #Not needed, but already present in following code so I'll keep it
+    j_values = rotational_levels_dict_values #Not needed, but already present in following code so I'll keep it
+    #elements_of_the_j_key_name = rotational_levels.split("_")#Might not be necessary
     if "j_"  and not "low_Ecoll" in j_keys:
-        refined_dictionary[j_keys] = rotational_levels[j_keys]
+        refined_dictionary[j_keys] = new_main_dictionary[j_keys]
         #refined_dictionary.append(rotational_levels) #This is not the way to add things to the dictionary
-        #indented if statement needed
+    
     elif "j_" and "low_Ecoll" in j_keys:
         
-        for levels, levels_dict_values in refined_dictionary:
+        for levels, levels_dict_values in refined_dictionary.items():
             level_name_list = levels.split("_") # From the refined dictionary
+            
             main_dict_name_split = j_keys.split("_")
             if level_name_list[1] == main_dict_name_split[1]:
                 collision_energies_dict = refined_dictionary[levels] #The dictionary within each Collisional energy
-                for E_colls, E_coll_values in collision_energies_dict:
+                for E_colls, E_coll_values in collision_energies_dict.items():
                     final_rotations_dict = refined_dictionary[levels][E_colls]
-                    for final_rotations, final_rotation_values in final_rotations_dict:
+                    for final_rotations, final_rotation_values in final_rotations_dict.items():
                         final_rotations_key_name_elements = final_rotations.split("_")
                         final_rot_list = final_rotation_values
-                        for main_dict_rots, main_dict_rot_values in main_dictionary[levels][E_colls]:
+                        rotational_dict = new_main_dictionary[levels][E_colls]
+                        for main_dict_rots, main_dict_rot_values in rotational_dict.items():
                             final_rots_key_name_elements = main_dict_rots.split("_")
                             main_dict_list = main_dict_rot_values
                             if final_rotations_key_name_elements[1] == final_rots_key_name_elements[1]:
-                                new_inel = final_rot_list[2] + main_dict_list[2]
-                                new_cplx = final_rot_list[3] + main_dict_list[3]
-                                new_total = final_rot_list[4] + main_dict_list[4]
+                                new_inel = float(final_rot_list[2]) + float(main_dict_list[2])
+                                new_cplx = float(final_rot_list[3]) + float(main_dict_list[3])
+                                new_total = float(final_rot_list[4]) + float(main_dict_list[4])
                                 final_rot_list[2] = new_inel
                                 final_rot_list[3] = new_cplx
                                 final_rot_list[4] = new_total
-                                #wassup
-
-with open("refined_dict", "w") as f:
-    f.write(str(refined_dictionary))
-
+refined_dictionary
+#with open("refined_dict", "w") as f:
+    #f.write(str(refined_dictionary))
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
