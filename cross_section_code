@@ -1,0 +1,98 @@
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import ast
+import copy
+
+with open("final_dictionary", "r") as f:
+    contents = f.read()
+
+final_dictionary_contents = ast.literal_eval(contents)
+final_dictionary_contents
+
+def cross_section_data(dict_contents, initial_rotational_levels, final_rotational_levels):
+    
+    init_j_keys = f"j_{initial_rotational_levels}_dir" #relevant keys to call in the dictionary
+    transition_keys = f"j_{initial_rotational_levels}_dir->j_{final_rotational_levels}" #relevant keys to call in the dictionary
+    init_j_to_final_j = f"j_{initial_rotational_levels}->j_{final_rotational_levels}" 
+    
+    relevant_nested_dict = dict_contents[init_j_keys]
+    
+    relevant_inel_plot_data = {}
+    relevant_cplx_frmtn_plot_data = {}
+    
+    for E_colls, E_coll_values in relevant_nested_dict.items():
+        #Select out the specific keys you want
+        transition_dictionary = relevant_nested_dict[E_colls][transition_keys]
+        
+        E_coll_part = E_colls.split("_")[2]
+        E_coll = float(E_coll_part)
+        
+        b_max = relevant_nested_dict[E_colls][transition_keys][1]
+        b_max_sq = b_max**2
+        
+        first_part = 3.1416 * b_max_sq
+        
+        total_trajs = relevant_nested_dict[E_colls][transition_keys][4]
+        
+        no_inel_colls = relevant_nested_dict[E_colls][transition_keys][2]
+        no_cplx_frmn_colls = relevant_nested_dict[E_colls][transition_keys][3]
+        
+        P_of_inel_colls = no_inel_colls/total_trajs
+        P_of_cplx_colls = no_cplx_frmn_colls/total_trajs
+        
+        inel_cross_sections = first_part * P_of_inel_colls
+        cplx_frmtn_cross_section = first_part * P_of_cplx_colls
+        
+        relevant_inel_plot_data[E_coll] = inel_cross_sections
+        relevant_cplx_frmtn_plot_data[E_coll] = cplx_frmtn_cross_section
+        
+    return init_j_to_final_j, relevant_inel_plot_data, relevant_cplx_frmtn_plot_data
+
+def cross_section_plots(dictionary, j_init, j_final):
+      title, inel_cross_section_values, cplx_frmtn_cross_section_values = cross_section_data(dict_contents=dictionary, 
+                                                                                           initial_rotational_levels=j_init, 
+                                                                                           final_rotational_levels=j_final)
+      E_coll_values = list(inel_cross_section_values.keys())  # x-axis values
+      inel_cross_section_plots = list(inel_cross_section_values.values())  # y-axis values (extracting from lists)
+      
+      fig, ax = plt.subplots(figsize=(25, 6))
+      
+      ax.set_xticks(E_coll_values)  # Ticks for each element
+      ax.set_xticklabels(E_coll_values)  # Labels for each tick (same as the values)
+      
+      #plt.figure(figsize=(10, 6))
+      
+      plt.plot(E_coll_values, inel_cross_section_plots, label= title, color='blue', marker='o', linestyle='-')
+      
+      plt.xlabel("Collisional Energies")  # Label for the x-axis
+      plt.ylabel("Cross section for inelastic collisions")  # Label for the y-axis
+      plt.title(f"{title} inelastic collisions")  # Title for the plot
+      
+      #plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/energy_levels_plot.png")
+      plt.legend()
+      plt.show()
+      
+      E_coll_values = list(cplx_frmtn_cross_section_values.keys())
+      cplx_frmtn_cross_section_plots = list(cplx_frmtn_cross_section_values.values())
+  
+      fig, ax = plt.subplots(figsize=(25, 6))
+      
+      ax.set_xticks(E_coll_values)  # Ticks for each element
+      ax.set_xticklabels(E_coll_values)  # Labels for each tick (same as the values)
+      
+      #plt.figure(figsize=(10, 6))
+      
+      plt.plot(E_coll_values, cplx_frmtn_cross_section_plots, label= title, color='blue', marker='o', linestyle='-')
+      
+      plt.xlabel("Collisional Energies")  # Label for the x-axis
+      plt.ylabel("Cross section for complex forming collisions")  # Label for the y-axis
+      plt.title(f"{title} complex forming collisions")  # Title for the plot
+      
+      #plt.savefig("/home/vishaldavidmoses/master_thesis/dynHO2/src/testrun/output_files/energy_levels_plot.png")
+      plt.legend()
+      plt.show()
+
+##########
+cross_section_plots(dictionary=final_dictionary_contents, j_init = "15", j_final = 7)
