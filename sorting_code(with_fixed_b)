@@ -177,47 +177,97 @@ for rotational_levels, rotational_levels_dict_values in new_main_dictionary.item
     if "j_"  and not "low_Ecoll" in j_keys:
         refined_dictionary[j_keys] = new_main_dictionary[j_keys]
         #refined_dictionary.append(rotational_levels) #This is not the way to add things to the dictionary
-    
-    elif "j_" and "low_Ecoll" in j_keys:
-        
-        for levels, levels_dict_values in refined_dictionary.items():
-            level_name_list = levels.split("_") # From the refined dictionary
-            
-            main_dict_name_split = j_keys.split("_")
-            if level_name_list[1] == main_dict_name_split[1]:
-                collision_energies_dict = refined_dictionary[levels] #The dictionary within each Collisional energy
-                for E_colls, E_coll_values in collision_energies_dict.items():
-                    final_rotations_dict = refined_dictionary[levels][E_colls]
-                    for final_rotations, final_rotation_values in final_rotations_dict.items():
-                        final_rotations_key_name_elements = final_rotations.split("_")
-                        final_rot_list = final_rotation_values
-                        rotational_dict = new_main_dictionary[levels][E_colls]
-                        for main_dict_rots, main_dict_rot_values in rotational_dict.items():
-                            final_rots_key_name_elements = main_dict_rots.split("_")
-                            main_dict_list = main_dict_rot_values
-                            if final_rotations_key_name_elements[1] == final_rots_key_name_elements[1]:
-                                new_inel = float(final_rot_list[2]) + float(main_dict_list[2])
-                                new_cplx = float(final_rot_list[3]) + float(main_dict_list[3])
-                                new_total = float(final_rot_list[4]) + float(main_dict_list[4])
-                                final_rot_list[2] = new_inel
-                                final_rot_list[3] = new_cplx
-                                final_rot_list[4] = new_total
+
+with open("refined_dict", "w") as f:
+    f.write(str(refined_dictionary))
+
 refined_dictionary
-#with open("refined_dict", "w") as f:
-    #f.write(str(refined_dictionary))
+
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 
+############################################################################################################################################################################
+############################################################################################################################################################################
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import ast
+import copy
+
+with open("main_dictionary", "r") as f:
+    contents = f.read()
+    
+new_main_dictionary = ast.literal_eval(contents)
+new_main_dictionary
 
 
-#Some variables for the above section (probably not even needed) 
-############################################################################################################################################################################
-############################################################################################################################################################################
-impact_parameter = "blablabla"
-impact_parameter_part = impact_parameter ** 2
-pi = 3.1416
-first_part = pi * impact_parameter_part
-second_part = probabilty_part
-cross_section = first_part * second_part
-############################################################################################################################################################################
-############################################################################################################################################################################
+largest_initial_rotational_level = "C:/Temporary_important_folder_1/Thesis_output_data_folder/j_21_dir/E_coll_7.0_kcalpmol/ho2_7.0kcal_v0j21_____fixb_4.0_yyy.out" #Enter file path here
+combined_data = file_to_combined_lists(file_path = largest_initial_rotational_level)
+
+#First designate highest rotational levels
+final_rotational_levels = []
+
+for row in combined_data:
+    final_rotational_levels.append(row[17])
+
+final_rotational_levels = [float(value) for value in final_rotational_levels]
+
+largest_value = max(final_rotational_levels) 
+largest_value = math.ceil(float(largest_value))
+
+
+#Initialise E_coll list
+low_E_colls = [0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8]
+#initialise final rotation level list
+final_rotation_list = []
+for final_rotation in np.arange(1, largest_value + 1, 2):
+    final_rotation_float = int(final_rotation)
+    final_rotation_list.append(final_rotation_float)
+
+print(final_rotation_list)
+print(low_E_colls)
+
+
+#Make "a_dictionary"
+a_dictionary = {}
+for main_init_levels, main_init_levels_values in new_main_dictionary.items():
+    #From this point on try not to call the nested dict keys and values make them as you go now
+    if "low_Ecoll_" not in main_init_levels:
+        #blablabla
+        a_dictionary[main_init_levels] = copy.deepcopy(new_main_dictionary[main_init_levels])
+    elif "low_Ecoll" in main_init_levels:
+        
+        main_init_levels_key_split = main_init_levels.split("_") #example of low E_coll j initial key 'j_01_dir_low_Ecoll_1'
+        no_low_Ecoll_j_init_key = f"{main_init_levels_key_split[0]}_{main_init_levels_key_split[1]}_{main_init_levels_key_split[2]}"
+        
+        for collisional_energy in low_E_colls:
+            E_coll_key = f"E_coll_{collisional_energy}"
+            for j_final in final_rotation_list:
+                
+                j_transitions_key_w_out_low_Ecoll = f"{no_low_Ecoll_j_init_key}->j_{j_final}" #This is the key WITH NO low E_coll
+                j_transitions_key_low_Ecoll = f"{main_init_levels}->j_{j_final}" #This is the key WITH low E_coll
+                relevant_a_dict_j_init_ = no_low_Ecoll_j_init_key 
+                
+                #call the relevant nested dictionary key-value pairs in both the dictionaries
+                a_dict_comp = a_dictionary[relevant_a_dict_j_init_][E_coll_key][j_transitions_key_w_out_low_Ecoll]
+                new_main_dict_comp = new_main_dictionary[main_init_levels][E_coll_key][j_transitions_key_low_Ecoll]
+                
+                print(f"a_dictionary list ={a_dict_comp}")
+                
+                new_inel_value = a_dict_comp[2] + new_main_dict_comp[2] 
+                new_cplx_frmtn_value = a_dict_comp[3] + new_main_dict_comp[3]
+                new_total_traj_value = a_dict_comp[4] + new_main_dict_comp[4]
+                
+                #Call the same relevant nest dictionary key-value pairs but this time ONLY for the a_dictionary dictionary
+                a_dict_comp[2] = new_inel_value
+                a_dict_comp[3] = new_cplx_frmtn_value
+                a_dict_comp[4] = new_total_traj_value
+                
+                print(f"a_dictionary component ={j_transitions_key_w_out_low_Ecoll} and new_main_dictionary component ={j_transitions_key_low_Ecoll}")
+                print(f"a_dictionary list ={a_dict_comp} and new_main_dictionary list ={new_main_dict_comp}")
+                print(f"new_inel_value = {new_inel_value}, new_cplx_frmtn_value = {new_cplx_frmtn_value}, new_total_traj_value = {new_total_traj_value}")
+
+
+with open("final_dictionary", "w") as f:
+    f.write(str(a_dictionary))
