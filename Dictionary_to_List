@@ -1,0 +1,97 @@
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import ast
+import copy
+
+with open("final_dictionary", "r") as f:
+    contents = f.read()
+
+final_dictionary_contents = ast.literal_eval(contents)
+
+#############################################################################################################################################################################
+#############################################################################################################################################################################
+
+#1st dimension of the array
+dict_to_list = [] 
+for init_j_keys, init_j_values in final_dictionary_contents.items():
+    #2nd dimension of the array = initial rotaional level
+    initial_j_dictionary = []
+    
+    for E_coll_keys, E_coll_values in final_dictionary_contents[init_j_keys].items():
+        #3rd dimension of the array = E_coll energy
+        E_coll_energy_dictionary = []
+        
+        for transition_keys, transition_values in final_dictionary_contents[init_j_keys][E_coll_keys].items():
+            #4th dimension of the array = j_initial -> j_final
+            final_j_dictionary = []
+            initial_j_level = init_j_keys
+            impact_parameter = transition_values[1]
+            collisional_energy = transition_values[0]
+            transition = transition_keys
+            number_of_collisions = transition_values[2]
+            number_cplx_forming_trajectories = transition_values[3]
+            total_number_of_trjectories = transition_values[4]
+            
+            # Append the relevant values to the 4th dimension
+            final_j_dictionary.append(initial_j_level)
+            final_j_dictionary.append(collisional_energy)
+            final_j_dictionary.append(transition)
+            final_j_dictionary.append(impact_parameter)
+            final_j_dictionary.append(number_of_collisions)
+            final_j_dictionary.append(number_cplx_forming_trajectories)
+            final_j_dictionary.append(total_number_of_trjectories)
+            
+            # Append to the 3rd dimension as the last step
+            E_coll_energy_dictionary.append(final_j_dictionary)
+        
+        # Append to the 2nd dimension as last step
+        initial_j_dictionary.append(E_coll_energy_dictionary)
+        
+    # Append to the 1st dimension as the last step
+    dict_to_list.append(initial_j_dictionary)
+
+print(dict_to_list)
+
+with open("final_list", "w") as f:
+    f.write(str(dict_to_list))
+
+with open("final_list", "r") as f:
+  f_l_contents = f.read()
+
+final_list_contents = ast.literal_eval(f_l_contents) 
+##########################################################################################################################################################################
+##########################################################################################################################################################################
+
+#1st dimension of the array
+cross_sections_list = []
+for init_rotational_level_dimension in dict_to_list:
+    #2nd dimension of the array = initial rotaional level
+    initial_rotational_level = []
+    
+    for collisional_energies_dimensions in dict_to_list[init_rotational_level_dimension]:
+        
+        #3rd dimension of the array = E_coll energy
+        E_coll_energy_ = []
+        
+        for final_rotational_level_dimension in dict_to_list[init_rotational_level_dimension][collisional_energies_dimensions]:
+            #The
+            #4th dimension of the array = j_initial -> j_final
+            final_j = []
+            initial_j_level = init_j_keys
+            impact_parameter = transition_values[1]
+            collisional_energy = transition_values[0]
+            transition = transition_keys
+            number_of_collisions = transition_values[2]
+            number_cplx_forming_trajectories = transition_values[3]
+            total_number_of_trjectories = transition_values[4]
+            
+            # Append the relevant values to the 4th dimension
+            final_j_dictionary.append(initial_j_level)
+            final_j_dictionary.append(collisional_energy)
+            final_j_dictionary.append(transition)
+            final_j_dictionary.append(impact_parameter)
+            final_j_dictionary.append(number_of_collisions)
+            final_j_dictionary.append(number_cplx_forming_trajectories)
+            final_j_dictionary.append(total_number_of_trjectories)
