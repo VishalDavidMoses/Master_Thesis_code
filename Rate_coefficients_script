@@ -1,0 +1,133 @@
+######################################################################################################################################################
+######################################################################################################################################################
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import ast
+import copy
+
+with open("final_dictionary", "r") as f:
+    contents = f.read()
+
+final_dictionary_contents = ast.literal_eval(contents)
+final_dictionary_contents
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+def cross_section_data(dict_contents, initial_rotational_levels, final_rotational_levels):
+    
+    init_j_keys = f"j_{initial_rotational_levels}_dir" #relevant keys to call in the dictionary
+    transition_keys = f"j_{initial_rotational_levels}_dir->j_{final_rotational_levels}" #relevant keys to call in the dictionary
+    init_j_to_final_j = f"j_{initial_rotational_levels}->j_{final_rotational_levels}" 
+    
+    relevant_nested_dict = dict_contents[init_j_keys]
+    
+    relevant_inel_plot_data = {}
+    relevant_cplx_frmtn_plot_data = {}
+    #relevant_propotion_cross_section = {}
+    
+    for E_colls, E_coll_values in relevant_nested_dict.items():
+        #Select out the specific keys you want
+        transition_dictionary = relevant_nested_dict[E_colls][transition_keys]
+        
+        E_coll_part = E_colls.split("_")[2]
+        E_coll = float(E_coll_part)
+        
+        b_max = relevant_nested_dict[E_colls][transition_keys][1]
+        b_max_sq = b_max**2
+        
+        first_part = 3.14169 * b_max_sq
+        
+        total_trajs = relevant_nested_dict[E_colls][transition_keys][4]
+        
+        no_inel_colls = relevant_nested_dict[E_colls][transition_keys][2]
+        no_cplx_frmn_colls = relevant_nested_dict[E_colls][transition_keys][3]
+        
+        P_of_inel_colls = no_inel_colls/total_trajs
+        P_of_cplx_colls = no_cplx_frmn_colls/total_trajs
+        
+        inel_cross_sections = first_part * P_of_inel_colls
+        cplx_frmtn_cross_section = first_part * P_of_cplx_colls
+        
+        #cplx_to_inel_cross_section = cplx_frmtn_cross_section/inel_cross_sections
+        
+        relevant_inel_plot_data[E_coll] = inel_cross_sections
+        relevant_cplx_frmtn_plot_data[E_coll] = cplx_frmtn_cross_section
+        #relevant_propotion_cross_section[E_coll] = cplx_to_inel_cross_section
+        
+    return init_j_to_final_j, relevant_inel_plot_data, relevant_cplx_frmtn_plot_data #, relevant_propotion_cross_section
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+final_rotations_list=[]
+for number in np.arange(1,50,2):
+    final_rotation = int(number)
+    final_rotations_list.append(final_rotation)
+
+print(final_rotations_list)
+
+collisional_energy_list = [0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1.0, 1.5, 2.0, 3.0, 5.0, 7.0]
+
+initial_rotational_level_list = ["01","05","11","15","21"]
+initial_rotational_level_dict = {"01": 1,
+                                 "05": 5,
+                                 "11": 11,
+                                 "15": 15,
+                                 "21": 21}
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+cross_sections_dictionary = {}
+for key, initial_rotation in initial_rotational_level_dict.items():
+    name_for_j_init = f"j_{initial_rotation}"
+    cross_sections_dictionary[name_for_j_init] = {}
+    initial_rotation_dictionary = {}
+    for j, final_rotation in enumerate(final_rotations_list):
+        name_for_final_j = f"j_{final_rotation}"
+        cross_sections_dictionary[name_for_j_init][name_for_final_j] = {"inel_collision": {},
+                                                                        "cplx_formation": {}}
+        title, inel_cross_section_values, cplx_frmtn_cross_section_values = cross_section_data(dict_contents=final_dictionary_contents, 
+                                                                                               initial_rotational_levels=key, 
+                                                                                               final_rotational_levels=final_rotation)
+        cross_sections_dictionary[name_for_j_init][name_for_final_j]["inel_collision"] = inel_cross_section_values
+        cross_sections_dictionary[name_for_j_init][name_for_final_j]["cplx_formation"] = cplx_frmtn_cross_section_values
+        
+
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+#Starting of the integration code I need to develop on for the rate coefficients
+
+cs_w_E_colls_list = []
+for i, collisional_energy in enumerate(collisional_energy_list):
+    E_coll_key = str(collisional_energy)
+    
+    if collisional_energy_list[i] != collisional_energy_list[-1]:
+        
+        i_plus_one = i + 1
+        E_coll_key_plus_one = collisional_energy_list[i_plus_one]
+        
+        f_x_cs = temp_dict[collisional_energy]
+        f_x_plus_one_cs = temp_dict[E_coll_key_plus_one]
+        addition_part = f_x_cs + f_x_plus_one_cs
+        first_part = addition_part/2
+        
+        x = collisional_energy
+        x_plus_one = collisional_energy_list[i_plus_one]
+        
+        second_part = x_plus_one - x
+        
+        multiplication = first_part * second_part
+
+        cs_w_E_colls_list.append(multiplication)
+######################################################################################################################################################
+######################################################################################################################################################
