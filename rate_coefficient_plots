@@ -1,0 +1,228 @@
+import os
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import ast
+import copy
+from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FuncFormatter
+
+with open("rate_coefficients_dictionary", "r") as f:
+    contents = f.read()
+
+final_dictionary_contents = ast.literal_eval(contents)
+final_dictionary_contents
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+def rate_coefficient_plot(dictionary, j_init, j_final):
+    
+    temperature_list = []
+    thounsand_by_temperature_list = []
+    
+    inel_rate_coefficient_list = []
+    inel_log_rate_coefficient_list =[]
+    
+    cplx_rate_coefficient_list = []
+    cplx_log_rate_coefficient_list =[]
+    
+    initial_rotation = f"j_{j_init}"
+    final_rotation = f"j_{j_final}"
+    
+    title = f"{initial_rotation}->{final_rotation}"
+    
+    for number in np.arange(50,1001):
+        temperature = int(number)
+        temperature_list.append(temperature)
+        inverse_temp = 1000/temperature
+        thounsand_by_temperature_list.append(inverse_temp)
+        
+        inel_rate_coefficient = dictionary[temperature][initial_rotation][final_rotation]["inel_collision"]
+        inel_rate_coefficient_list.append(inel_rate_coefficient)
+        log_of_inel_rate_coeff = math.log(inel_rate_coefficient)
+        inel_log_rate_coefficient_list.append(log_of_inel_rate_coeff)
+        
+        cplx_rate_coefficient = dictionary[temperature][initial_rotation][final_rotation]["cplx_formation"]
+        cplx_rate_coefficient_list.append(cplx_rate_coefficient)
+        log_of_cplx_rate_coeff = math.log(cplx_rate_coefficient)
+        cplx_log_rate_coefficient_list.append(log_of_cplx_rate_coeff)
+    
+    
+    inel_rate_coefficient_y_ticks = inel_log_rate_coefficient_list
+    inel_rate_coefficient_y_values = inel_rate_coefficient_list
+    
+    temperature_x_ticks = thounsand_by_temperature_list
+    temperature_x_label = temperature_list
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    ax.xaxis.set_major_locator(MaxNLocator(10))  # max 10 ticks
+    ax.yaxis.set_major_locator(MaxNLocator(8))   # max 8 ticks
+    
+    plt.plot(temperature_x_ticks, inel_rate_coefficient_y_ticks, label= title, color='blue', marker='o', linestyle='-')
+    
+    plt.xlabel("Temperature 1000/T")  # Label for the x-axis
+    plt.ylabel("Rate Coefficients for inelastic collisions ln(k(T))")  # Label for the y-axis
+    plt.title(f"{title} inelastic collisions")  # Title for the plot
+    
+    plt.savefig(f"C:/Temporary_important_folder_1/Thesis_Time/images/temporary_rate_coefficients_folder/{initial_rotation}_to_{final_rotation}_inelastic_rate_coefficients.png")
+    plt.legend()
+    plt.show()
+    
+    cplx_rate_coefficient_y_ticks = cplx_log_rate_coefficient_list
+    cplx_rate_coefficient_y_values = cplx_rate_coefficient_list
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    
+    ax.xaxis.set_major_locator(MaxNLocator(10))  # max 10 ticks
+    ax.yaxis.set_major_locator(MaxNLocator(8))   # max 8 ticks
+    
+    plt.plot(temperature_x_ticks, cplx_rate_coefficient_y_ticks, label= title, color='blue', marker='o', linestyle='-')
+    
+    plt.xlabel("Temperature 1000/T")  # Label for the x-axis
+    plt.ylabel("Rate Coefficients for complex forming collisions ln(k(T))")  # Label for the y-axis
+    plt.title(f"{title} complex forming collisions")  # Title for the plot
+    
+    plt.savefig(f"C:/Temporary_important_folder_1/Thesis_Time/images/temporary_rate_coefficients_folder/{initial_rotation}_to_{final_rotation}_cplx_rate_coefficients.png")
+    plt.legend()
+    plt.show()
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+rate_coefficient_plot(dictionary = final_dictionary_contents, j_init = 5, j_final = 7)
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+def rate_coefficient_data(dictionary, j_init, j_final):
+        
+    temperature_list = []
+    thounsand_by_temperature_list = []
+    
+    inel_rate_coefficient_list = []
+    inel_log_rate_coefficient_list =[]
+    
+    cplx_rate_coefficient_list = []
+    cplx_log_rate_coefficient_list =[]
+    
+    initial_rotation = f"j_{j_init}"
+    final_rotation = f"j_{j_final}"
+    
+    title = f"{initial_rotation}->{final_rotation}"
+    
+    for number in np.arange(50,501):
+        temperature = int(number)
+        temperature_list.append(temperature)
+        inverse_temp = 1000/temperature
+        thounsand_by_temperature_list.append(inverse_temp)
+        
+        inel_rate_coefficient = dictionary[temperature][initial_rotation][final_rotation]["inel_collision"]
+        inel_rate_coefficient_list.append(inel_rate_coefficient)
+        log_of_inel_rate_coeff = math.log10(inel_rate_coefficient)
+        inel_log_rate_coefficient_list.append(log_of_inel_rate_coeff)
+        
+        cplx_rate_coefficient = dictionary[temperature][initial_rotation][final_rotation]["cplx_formation"]
+        cplx_rate_coefficient_list.append(cplx_rate_coefficient)
+        log_of_cplx_rate_coeff = math.log10(cplx_rate_coefficient)
+        cplx_log_rate_coefficient_list.append(log_of_cplx_rate_coeff)
+    
+    
+    inel_rate_coefficient_y_ticks = inel_log_rate_coefficient_list
+    inel_rate_coefficient_y_values = inel_rate_coefficient_list
+    
+    temperature_x_ticks = thounsand_by_temperature_list
+    temperature_x_label = temperature_list
+    
+    cplx_rate_coefficient_y_ticks = cplx_log_rate_coefficient_list
+    cplx_rate_coefficient_y_values = cplx_rate_coefficient_list
+    return inel_rate_coefficient_y_ticks, inel_rate_coefficient_y_values, cplx_rate_coefficient_y_ticks, cplx_rate_coefficient_y_values, temperature_x_ticks, temperature_x_label
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+inel_rate_coefficient_y_ticks_5_to_1, inel_rate_coefficient_y_values_5_to_1, cplx_rate_coefficient_y_ticks_5_to_1, cplx_rate_coefficient_y_values_5_to_1, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 5, j_final = 1)
+inel_rate_coefficient_y_ticks_5_to_3, inel_rate_coefficient_y_values_5_to_3, cplx_rate_coefficient_y_ticks_5_to_3, cplx_rate_coefficient_y_values_5_to_3, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 5, j_final = 3)
+inel_rate_coefficient_y_ticks_5_to_7, inel_rate_coefficient_y_values_5_to_7, cplx_rate_coefficient_y_ticks_5_to_7, cplx_rate_coefficient_y_values_5_to_7, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 5, j_final = 7)
+inel_rate_coefficient_y_ticks_5_to_9, inel_rate_coefficient_y_values_5_to_9, cplx_rate_coefficient_y_ticks_5_to_9, cplx_rate_coefficient_y_values_5_to_9, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 5, j_final = 9)
+
+
+inel_rate_coefficient_y_ticks_11_to_5, inel_rate_coefficient_y_values_11_to_5, cplx_rate_coefficient_y_ticks_11_to_5, cplx_rate_coefficient_y_values_11_to_5, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 5)
+inel_rate_coefficient_y_ticks_11_to_7, inel_rate_coefficient_y_values_11_to_7, cplx_rate_coefficient_y_ticks_11_to_7, cplx_rate_coefficient_y_values_11_to_7, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 7)
+inel_rate_coefficient_y_ticks_11_to_9, inel_rate_coefficient_y_values_11_to_9, cplx_rate_coefficient_y_ticks_11_to_9, cplx_rate_coefficient_y_values_11_to_9, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 9)
+inel_rate_coefficient_y_ticks_11_to_13, inel_rate_coefficient_y_values_11_to_13, cplx_rate_coefficient_y_ticks_11_to_13, cplx_rate_coefficient_y_values_11_to_13, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 13)
+inel_rate_coefficient_y_ticks_11_to_15, inel_rate_coefficient_y_values_11_to_15, cplx_rate_coefficient_y_ticks_11_to_15, cplx_rate_coefficient_y_values_11_to_15, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 15)
+inel_rate_coefficient_y_ticks_11_to_17, inel_rate_coefficient_y_values_11_to_17, cplx_rate_coefficient_y_ticks_11_to_17, cplx_rate_coefficient_y_values_11_to_17, temperature_x_ticks, temperature_x_label = rate_coefficient_data(
+    dictionary = final_dictionary_contents, j_init = 11, j_final = 17)
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+ax.xaxis.set_major_locator(MaxNLocator(10))  # max 10 ticks
+ax.yaxis.set_major_locator(MaxNLocator(8))   # max 8 ticks
+
+plt.plot(temperature_x_ticks, inel_rate_coefficient_y_ticks_5_to_1, label= "j_5->j_1", color='blue', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, inel_rate_coefficient_y_ticks_5_to_3, label= "j_5->j_3", color='green', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, inel_rate_coefficient_y_ticks_5_to_7, label= "j_5->j_7", color='black', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, inel_rate_coefficient_y_ticks_5_to_9, label= "j_5->j_9", color='red', marker='o', linestyle='-')
+
+
+plt.xlabel("Temperature 1000/T (K)")  # Label for the x-axis
+plt.ylabel(r"Rate Coefficients $\ln\left(k(T)\right)$  (cm$^3$ s$^{-1}$)")  # Label for the y-axis
+plt.title(f"Rate Coefficients for inelastic collisions with initial rotational level, j_init = 5")  # Title for the plot
+plt.legend()
+plt.savefig(f"C:/Temporary_important_folder_1/Thesis_Time/images/temporary_rate_coefficients_folder/j_5_inellastic_collisions_rate_coefficients.png")
+
+plt.show()
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
+fig, ax = plt.subplots(figsize=(12, 6))
+
+ax.xaxis.set_major_locator(MaxNLocator(10))  # max 10 ticks
+ax.yaxis.set_major_locator(MaxNLocator(8))   # max 8 ticks
+
+plt.plot(temperature_x_ticks, cplx_rate_coefficient_y_ticks_5_to_1, label= "j_5->j_1", color='blue', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, cplx_rate_coefficient_y_ticks_5_to_3, label= "j_5->j_3", color='green', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, cplx_rate_coefficient_y_ticks_5_to_7, label= "j_5->j_7", color='black', marker='o', linestyle='-')
+plt.plot(temperature_x_ticks, cplx_rate_coefficient_y_ticks_5_to_9, label= "j_5->j_9", color='red', marker='o', linestyle='-')
+
+
+plt.xlabel("Temperature 1000/T")  # Label for the x-axis
+plt.ylabel(r"Rate Coefficients $\ln\left(k(T)\right)$  (cm$^3$ s$^{-1}$)")  # Label for the y-axis
+plt.title(f"Rate Coefficients for complex forming collisions with initial rotational level, j_init = 5")  # Title for the plot
+plt.legend()
+plt.savefig(f"C:/Temporary_important_folder_1/Thesis_Time/images/temporary_rate_coefficients_folder/j_5_cplx_forming_collisions_rate_coefficients.png")
+
+plt.show()
+
+##########################################################################################################################################
+##########################################################################################################################################
+
+##########################################################################################################################################
+##########################################################################################################################################
