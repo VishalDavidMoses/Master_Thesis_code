@@ -107,8 +107,11 @@ for key, initial_rotation in initial_rotational_level_dict.items():
 ######################################################################################################################################################
 initial_rotational_level_list = [1,5,11,15,21]
 
+ten_power_minus_ten = 10**(-20)
 ten_exp = 10**(-3)
-k_B = 8.314462618 * ten_exp #kJ mol^-1 K^-1
+ten_pos_exp = 10**(3)
+k_B = ten_pos_exp * 8.314462618 * ten_exp #J mol^-1 K^-1
+print(k_B)
 temperature_dict = {}
 discrete_integral_values_dict = {} # discrete_integral_values_dict
 for l, temperature in enumerate(np.arange(10,2001)):
@@ -125,7 +128,6 @@ for l, temperature in enumerate(np.arange(10,2001)):
             final_rotation = f"j_{final_rotation}"
             temperature_dict[temp][initial_rotation_key][final_rotation] = {}
             
-            
             temporary_inel_dict = copy.deepcopy(cross_sections_dictionary[initial_rotation_key][final_rotation]["inel_collision"])
             temporary_cplx_frmtn_dict = copy.deepcopy(cross_sections_dictionary[initial_rotation_key][final_rotation]["cplx_formation"])
             
@@ -140,9 +142,9 @@ for l, temperature in enumerate(np.arange(10,2001)):
                     i_plus_one = i + 1
                     E_coll_key_plus_one = collisional_energy_list[i_plus_one]
                     
-                    x = collisional_energy * 4.184 #kJ mol^-1
+                    x = collisional_energy * 4184 #J mol^-1
                     x_plus_one_index = collisional_energy_list[i_plus_one] 
-                    x_plus_one = x_plus_one_index * 4.184 #kJ mol^-1
+                    x_plus_one = x_plus_one_index * 4184 #J mol^-1
                     
                     negative_x = -x
                     exp_part_x = negative_x/k_B_T_part
@@ -152,11 +154,15 @@ for l, temperature in enumerate(np.arange(10,2001)):
                     exp_part_negative_x_plus_one = math.exp(negative_x_plus_one)
                     exponent_negative_x_plus_one = exp_part_negative_x_plus_one/k_B_T_part
                     
-                    f_x_cs_inel = temporary_inel_dict[collisional_energy]
-                    f_x_plus_one_cs_inel = temporary_inel_dict[E_coll_key_plus_one]
+                    f_x_cs_inel_w_out_m = temporary_inel_dict[collisional_energy]
+                    f_x_cs_inel = f_x_cs_inel_w_out_m * ten_power_minus_ten
+                    f_x_plus_one_cs_inel_w_out_m = temporary_inel_dict[E_coll_key_plus_one]
+                    f_x_plus_one_cs_inel = f_x_plus_one_cs_inel_w_out_m * ten_power_minus_ten
                     
-                    f_x_cs_cplx = temporary_cplx_frmtn_dict[collisional_energy]
-                    f_x_plus_one_cs_cplx = temporary_cplx_frmtn_dict[E_coll_key_plus_one]
+                    f_x_cs_cplx_w_out_m = temporary_cplx_frmtn_dict[collisional_energy]
+                    f_x_cs_cplx = f_x_cs_cplx_w_out_m * ten_power_minus_ten #makes it m^2
+                    f_x_plus_one_cs_cplx_w_out_m = temporary_cplx_frmtn_dict[E_coll_key_plus_one]
+                    f_x_plus_one_cs_cplx = f_x_plus_one_cs_cplx_w_out_m * ten_power_minus_ten
                     
                     g_x_cs_inel = f_x_cs_inel * x * exponent_x
                     g_x_plus_one_cs_inel = f_x_plus_one_cs_inel * x_plus_one * exponent_negative_x_plus_one
@@ -179,22 +185,36 @@ for l, temperature in enumerate(np.arange(10,2001)):
                     temperature_dict[temp][initial_rotation_key][final_rotation]["inel_collision"].append(multiplication_inel)
                     temperature_dict[temp][initial_rotation_key][final_rotation]["cplx_formation"].append(multiplication_cplx)
                     
+                    
+                    
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+
+with open("temperature_int_values", "w") as f:
+    f.write(str(temperature_dict))
+
 ######################################################################################################################################################
 ######################################################################################################################################################
 
 ######################################################################################################################################################
 ######################################################################################################################################################
 ten_exp = 10**(-3)
-k_B = 8.314462618 * ten_exp
+ten_pos_exp = 10**(3)
+k_B = ten_pos_exp * 8.314462618 * ten_exp
 
-ten_to_minus_4 = 10**(-4)
-pi_mu = 3.1416 * 9.69697 * ten_to_minus_4
+ten_to_minus_3 = 10**(-3)
+pi_mu = 3.1416 * 0.969697 * ten_to_minus_3
 
 eight_by_pi_mu = 8/pi_mu
 
 eight_by_pi_mu_power = eight_by_pi_mu**(0.5)
 
 rate_coefficients_dict = {} # cs_w_E_colls_dict
+
+one_million = 10**(6)
 
 for k, temperature in enumerate(np.arange(10,2001)):
     temp = int(temperature)
@@ -224,12 +244,20 @@ for k, temperature in enumerate(np.arange(10,2001)):
             temporary_inel_list_sum = sum(temporary_inel_list)
             temporary_cplx_frmtn_list_sum = sum(temporary_cplx_frmtn_list)
             
-            rate_coefficient_inel = pre_int_factor * temporary_inel_list_sum
-            rate_coefficient_cplx = pre_int_factor * temporary_cplx_frmtn_list_sum
+            rate_coefficient_inel = pre_int_factor * temporary_inel_list_sum * one_million
+            rate_coefficient_cplx = pre_int_factor * temporary_cplx_frmtn_list_sum * one_million
             
             rate_coefficients_dict[temp][initial_rotation_key][final_rotation]["inel_collision"]=rate_coefficient_inel
             rate_coefficients_dict[temp][initial_rotation_key][final_rotation]["cplx_formation"]=rate_coefficient_cplx
+            
 
+######################################################################################################################################################
+######################################################################################################################################################
+
+######################################################################################################################################################
+######################################################################################################################################################
+with open("rate_coefficients_dictionary", "w") as f:
+    f.write(str(rate_coefficients_dict))
 ######################################################################################################################################################
 ######################################################################################################################################################
 
